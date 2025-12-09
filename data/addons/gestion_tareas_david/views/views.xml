@@ -1,0 +1,41 @@
+<odoo>
+  <data>
+    <!-- explicit list view definition -->
+
+    <record model="ir.ui.view" id="gestion_tareas_david.list">
+      <field name="name">gestion_tareas_david list</field>
+      <field name="model">gestion_tareas_david.gestion_tareas_david</field>
+      <field name="arch" type="xml">
+        <list>
+          <field name="nombre"/>
+          <field name="descripcion"/>
+        </list>
+      </field>
+    </record>
+
+    <!-- actions opening views on models -->
+
+    <record model="ir.actions.act_window" id="gestion_tareas_david.action_window">
+      <field name="name">gestion_tareas_david window</field>
+      <field name="res_model">gestion_tareas_david.gestion_tareas_david</field>
+      <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Top menu item -->
+
+    <menuitem name="gestion_tareas_david" id="gestion_tareas_david.menu_root"/>
+
+    <!-- menu categories -->
+    <menuitem name="Tareas" id="gestion_tareas_david.tareas" parent="gestion_tareas_david.menu_root"/>
+<!--
+    <menuitem name="Menu 2" id="gestion_tareas_david.menu_2" parent="gestion_tareas_david.menu_root"/>
+-->
+    <!-- actions -->
+    <menuitem name="List" id="gestion_tareas_david.tareas_list" parent="gestion_tareas_david.tareas"
+              action="gestion_tareas_david.action_window"/>
+<!--
+    <menuitem name="Server to list" id="gestion_tareas_david" parent="gestion_tareas_david.menu_2"
+              action="gestion_tareas_david.action_server"/>
+-->
+  </data>
+</odoo>

@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_gestion_tareas_david_gestion_tareas_david,gestion_tareas_david.gestion_tareas_david,model_gestion_tareas_david_gestion_tareas_david,base.group_user,1,1,1,1

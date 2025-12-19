@@ -1,41 +1,110 @@
 <odoo>
   <data>
-    <!-- explicit list view definition -->
-
-    <record model="ir.ui.view" id="gestion_tareas_david.list">
-      <field name="name">gestion_tareas_david list</field>
-      <field name="model">gestion_tareas_david.gestion_tareas_david</field>
+    <!-- VISTAS PARA TAREAS -->
+    
+    <record model="ir.ui.view" id="gestion_tareas_david.tareas_list">
+      <field name="name">Lista de Tareas</field>
+      <field name="model">gestion_tareas_david.tareas_david</field>
       <field name="arch" type="xml">
         <list>
+          <field name="codigo"/>
           <field name="nombre"/>
           <field name="descripcion"/>
+
         </list>
       </field>
     </record>
 
-    <!-- actions opening views on models -->
+    <record model="ir.ui.view" id="gestion_tareas_david.tareas_form">
+      <field name="name">Formulario de Tareas</field>
+      <field name="model">gestion_tareas_david.tareas_david</field>
+      <field name="arch" type="xml">
+        <form>
+          <sheet>
+            <group>
+              <field name="codigo"/>
+              <field name="nombre"/>
+              <field name="descripcion"/>
+              <field name="fecha_ini"/>
+              <field name="fecha_fin"/>
+              <field name="fecha_creacion"/>
+              <field name="finalizado"/>
+              <field name="sprint"/>
+              <field name="rel_tecnologias" widget="many2many_tags"/>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+    
+    <!-- VISTAS PARA SPRINTS -->
+    <record model="ir.ui.view" id="gestion_tareas_david.sprints_list">
+      <field name="name">Lista de Sprints</field>
+      <field name="model">gestion_tareas_david.sprints_david</field>
+      <field name="arch" type="xml">
+        <list>
+          <field name="name"/>
+          <field name="descripcion"/>
+          <field name="fecha_ini"/>
+          <field name="fecha_fin"/>
+        </list>
+      </field>
+    </record>
 
-    <record model="ir.actions.act_window" id="gestion_tareas_david.action_window">
-      <field name="name">gestion_tareas_david window</field>
-      <field name="res_model">gestion_tareas_david.gestion_tareas_david</field>
+    <record model="ir.ui.view" id="gestion_tareas_david.sprints_form">
+      <field name="name">Formulario de Sprints</field>
+      <field name="model">gestion_tareas_david.sprints_david</field>
+      <field name="arch" type="xml">
+        <form>
+          <sheet>
+            <group>
+              <field name="name"/>
+              <field name="descripcion"/>
+            </group>
+            <group>
+              <field name="fecha_ini"/>
+              <field name="fecha_fin"/>
+            </group>
+            <notebook>
+              <page string="Tareas del Sprint">
+                <field name="tareas">
+                  <list>
+                    <field name="nombre"/>
+                    <field name="descripcion"/>
+                    <field name="fecha_ini"/>
+                    <field name="fecha_fin"/>
+                    <field name="finalizado"/>
+                  </list>
+                </field>
+              </page>
+            </notebook>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <!-- ACCIONES -->
+    <record model="ir.actions.act_window" id="gestion_tareas_david.action_tareas">
+      <field name="name">Tareas</field>
+      <field name="res_model">gestion_tareas_david.tareas_david</field>
       <field name="view_mode">list,form</field>
     </record>
 
-    <!-- Top menu item -->
+    <record model="ir.actions.act_window" id="gestion_tareas_david.action_sprints">
+      <field name="name">Sprints</field>
+      <field name="res_model">gestion_tareas_david.sprints_david</field>
+      <field name="view_mode">list,form</field>
+    </record>
 
-    <menuitem name="gestion_tareas_david" id="gestion_tareas_david.menu_root"/>
+    <!-- MENÚS -->
+    <menuitem name="Gestión de Tareas" id="gestion_tareas_david.menu_root"/>
 
-    <!-- menu categories -->
-    <menuitem name="Tareas" id="gestion_tareas_david.tareas" parent="gestion_tareas_david.menu_root"/>
-<!--
-    <menuitem name="Menu 2" id="gestion_tareas_david.menu_2" parent="gestion_tareas_david.menu_root"/>
--->
-    <!-- actions -->
-    <menuitem name="List" id="gestion_tareas_david.tareas_list" parent="gestion_tareas_david.tareas"
-              action="gestion_tareas_david.action_window"/>
-<!--
-    <menuitem name="Server to list" id="gestion_tareas_david" parent="gestion_tareas_david.menu_2"
-              action="gestion_tareas_david.action_server"/>
--->
+
+    <menuitem name="Tareas" id="gestion_tareas_david.menu_tareas" parent="gestion_tareas_david.menu_root"
+              action="gestion_tareas_david.action_tareas"/>
+              
+    <menuitem name="Sprints" id="gestion_tareas_david.menu_sprints" parent="gestion_tareas_david.menu_root"
+              action="gestion_tareas_david.action_sprints"/>
+
   </data>
 </odoo>

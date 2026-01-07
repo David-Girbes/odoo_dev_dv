@@ -1,66 +1,163 @@
 <odoo>
   <data>
-    <!-- explicit list view definition -->
 
-    <record model="ir.ui.view" id="gestion_restaurante_david.list">
+    <!--  VISTAS DE PLATOS  -->
+    
+    <!-- Lista de platos -->
+    <record model="ir.ui.view" id="plato_list">
       <field name="name">Lista de Platos</field>
       <field name="model">gestion_restaurante_david.plato_david</field>
       <field name="arch" type="xml">
         <list>
           <field name="name"/>
+          <field name="categoria"/>
           <field name="precio"/>
           <field name="disponible"/>
-          <field name="categoria"/>
+          <field name="menu_id"/>
         </list>
       </field>
     </record>
 
-    <record model="ir.ui.view" id="restaurante_form">
-    <field name="name">gestion_restaurante_david.plato_david.form</field>
-    <field name="model">gestion_restaurante_david.plato_david</field>
-    <field name="arch" type="xml">
+    <!-- Formulario de platos -->
+    <record model="ir.ui.view" id="plato_form">
+      <field name="name">Formulario de Platos</field>
+      <field name="model">gestion_restaurante_david.plato_david</field>
+      <field name="arch" type="xml">
         <form>
-            <sheet>
-                <group>
-                    <field name="name"/>
-                    <field name="descripcion"/>
-                    <field name="precio"/>
-                    <field name="tiempo_preparacion"/>
-                    <field name="disponible"/>
-                    <field name="categoria"/>
-                </group>
-            </sheet>
+          <sheet>
+            <group>
+              <group>
+                <field name="name"/>
+                <field name="descripcion"/>
+                <field name="categoria"/>
+                <field name="menu_id"/>
+              </group>
+              <group>
+                <field name="precio"/>
+                <field name="tiempo_preparacion"/>
+                <field name="disponible"/>
+                <field name="ingrediente_ids" widget="many2many_tags"/>
+              </group>
+            </group>
+          </sheet>
         </form>
-    </field>
-</record>
+      </field>
+    </record>
 
-
-    <!-- actions opening views on models -->
-
-    <record model="ir.actions.act_window" id="gestion_restaurante_david.action_window">
-      <field name="name">Gestión de Platos</field>
+    <!-- Acción de platos -->
+    <record model="ir.actions.act_window" id="action_platos">
+      <field name="name">Platos</field>
       <field name="res_model">gestion_restaurante_david.plato_david</field>
       <field name="view_mode">list,form</field>
     </record>
 
 
+    <!--  VISTAS DE MENÚS  -->
     
+    <!-- Lista de menús -->
+    <record model="ir.ui.view" id="menu_list">
+      <field name="name">Lista de Menús</field>
+      <field name="model">gestion_restaurante_david.menu_david</field>
+      <field name="arch" type="xml">
+        <list>
+          <field name="name"/>
+          <field name="fecha_inicio"/>
+          <field name="fecha_fin"/>
+          <field name="activo"/>
+        </list>
+      </field>
+    </record>
 
-    <!-- Top menu item -->
+    <!-- Formulario de menús -->
+    <record model="ir.ui.view" id="menu_form">
+      <field name="name">Formulario de Menús</field>
+      <field name="model">gestion_restaurante_david.menu_david</field>
+      <field name="arch" type="xml">
+        <form>
+          <sheet>
+            <group>
+              <group>
+                <field name="name"/>
+                <field name="descripcion"/>
+              </group>
+              <group>
+                <field name="fecha_inicio"/>
+                <field name="fecha_fin"/>
+                <field name="activo"/>
+              </group>
+            </group>
+            <field name="platos">
+              <list>
+                <field name="name"/>
+                <field name="categoria"/>
+                <field name="precio"/>
+                <field name="disponible"/>
+              </list>
+            </field>
+          </sheet>
+        </form>
+      </field>
+    </record>
 
-    <menuitem name="Restaurante" id="gestion_restaurante_david.menu_root"/>
+    <!-- Acción de menús -->
+    <record model="ir.actions.act_window" id="action_menus">
+      <field name="name">Menús</field>
+      <field name="res_model">gestion_restaurante_david.menu_david</field>
+      <field name="view_mode">list,form</field>
+    </record>
 
-    <!-- menu categories -->
-    <menuitem name="Menú" id="gestion_restaurante_david.menu_1" parent="gestion_restaurante_david.menu_root"/>
-<!--
-    <menuitem name="Menu 2" id="gestion_restaurante_david.menu_2" parent="gestion_restaurante_david.menu_root"/>
--->
-    <!-- actions -->
-    <menuitem name="Platos" id="gestion_restaurante_david.platos_list" parent="gestion_restaurante_david.menu_1"
-              action="gestion_restaurante_david.action_window"/>
-<!--
-    <menuitem name="Server to list" id="gestion_restaurante_david" parent="gestion_restaurante_david.menu_2"
-              action="gestion_restaurante_david.action_server"/>
--->
+
+    <!-- VISTAS DE INGREDIENTES -->
+    
+    <!-- Lista de ingredientes -->
+    <record model="ir.ui.view" id="ingrediente_list">
+      <field name="name">Lista de Ingredientes</field>
+      <field name="model">gestion_restaurante_david.ingredientes_david</field>
+      <field name="arch" type="xml">
+        <list>
+          <field name="name"/>
+        </list>
+      </field>
+    </record>
+
+    <!-- Formulario de ingredientes -->
+    <record model="ir.ui.view" id="ingrediente_form">
+      <field name="name">Formulario de Ingredientes</field>
+      <field name="model">gestion_restaurante_david.ingredientes_david</field>
+      <field name="arch" type="xml">
+        <form>
+          <sheet>
+            <group>
+              <field name="name"/>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <!-- Acción de ingredientes -->
+    <record model="ir.actions.act_window" id="action_ingredientes">
+      <field name="name">Ingredientes</field>
+      <field name="res_model">gestion_restaurante_david.ingredientes_david</field>
+      <field name="view_mode">list,form</field>
+    </record>
+
+
+    <!--  MENÚ PRINCIPAL -->
+    
+    <!-- Menú raíz -->
+    <menuitem name="Restaurante" id="menu_root"/>
+
+    <!-- Submenú de gestión -->
+    <menuitem name="Gestión" id="menu_gestion" parent="menu_root"/>
+
+    <!-- Items del menú -->
+    <menuitem name="Menús" id="menuitem_menus" parent="menu_gestion"
+              action="action_menus" sequence="1"/>
+    <menuitem name="Platos" id="menuitem_platos" parent="menu_gestion"
+              action="action_platos" sequence="2"/>
+    <menuitem name="Ingredientes" id="menuitem_ingredientes" parent="menu_gestion"
+              action="action_ingredientes" sequence="3"/>
+
   </data>
 </odoo>

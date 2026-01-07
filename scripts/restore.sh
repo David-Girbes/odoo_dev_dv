@@ -75,4 +75,3 @@ docker compose up -d "${ODOO_CONTAINER}"
 
 echo "======================================================="
 echo " RESTAURACIÓN COMPLETA. Accede a: http://localhost:8069"
-echo "=================================

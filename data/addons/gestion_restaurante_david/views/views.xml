@@ -10,8 +10,11 @@
       <field name="arch" type="xml">
         <list>
           <field name="name"/>
+          <field name="codigo"/>
           <field name="categoria"/>
           <field name="precio"/>
+          <field name="precio_con_iva"/>
+          <field name="precio_final"/>
           <field name="disponible"/>
           <field name="menu_id"/>
         </list>
@@ -26,17 +29,27 @@
         <form>
           <sheet>
             <group>
-              <group>
+              <group string="Información General">
                 <field name="name"/>
-                <field name="descripcion"/>
+                <field name="codigo"/>
                 <field name="categoria"/>
-                <field name="menu_id"/>
+                <field name="descripcion"/>
               </group>
-              <group>
+              <group string="Precios">
                 <field name="precio"/>
+                <field name="precio_con_iva"/>
+                <field name="descuento"/>
+                <field name="precio_final"/>
+              </group>
+            </group>
+            <group>
+              <group string="Detalles">
                 <field name="tiempo_preparacion"/>
                 <field name="disponible"/>
-                <field name="ingrediente_ids" widget="many2many_tags"/>
+                <field name="menu_id"/>
+              </group>
+              <group string="Ingredientes">
+                <field name="ingrediente_ids" widget="many2many_tags" nolabel="1"/>
               </group>
             </group>
           </sheet>
@@ -84,16 +97,17 @@
                 <field name="fecha_inicio"/>
                 <field name="fecha_fin"/>
                 <field name="activo"/>
+                <field name="precio_total"/>
               </group>
             </group>
             <field name="platos">
               <list>
                 <field name="name"/>
                 <field name="categoria"/>
-                <field name="precio"/>
+                <field name="precio_final"/>
                 <field name="disponible"/>
-              </list>
-            </field>
+              </list>            
+            </field>            
           </sheet>
         </form>
       </field>

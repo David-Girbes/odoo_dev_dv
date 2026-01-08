@@ -1,4 +1,4 @@
-from odoo import models, fields
+from odoo import models, fields,api
 
 
 class plato_david(models.Model):
@@ -41,6 +41,17 @@ class plato_david(models.Model):
         required=True
     )
 
+    codigo = fields.Char(compute="_get_codigo")
+
+    precio_con_iva = fields.Float(compute="_compute_precio_iva")
+
+    descuento = fields.Float(string="Descuento (%)",default=0)
+
+    precio_final = fields.Float(
+        compute="_compute_precio_final",
+        store=True,
+        string = "Precio Final")
+
     menu_id = fields.Many2one(
         comodel_name="gestion_restaurante_david.menu_david",
         string="Menú",
@@ -55,6 +66,32 @@ class plato_david(models.Model):
         column2="ingrediente_id",
         string="Ingredientes"
     )
+    def _get_codigo(self):
+        for plato in self:
+            if not plato.categoria:
+                plato.codigo = "PLT_" + str(plato.id)
+            else:
+                plato.codigo = str(plato.categoria[:3]).upper() + "_" + str(plato.id)
+
+    @api.depends('precio')
+    def _compute_precio_iva(self):
+        for plato in self:
+            if plato.precio:
+                plato.precio_con_iva = plato.precio * 1.10
+            else:
+                plato.precio_con_iva = 0.0
+    
+    @api.depends('precio', 'descuento')
+    def _compute_precio_final(self):
+        for plato in self:
+            if plato.precio:
+                if plato.descuento:
+                    plato.precio_final = plato.precio * (1 - plato.descuento / 100)
+                else:
+                    plato.precio_final = plato.precio
+            else:
+                plato.precio_final = 0.0
+
 
 
 class menu_david(models.Model):
@@ -90,8 +127,16 @@ class menu_david(models.Model):
         help="Platos que pertenecen a este menú" 
     )
 
-
-
+    precio_total = fields.Float(
+        string="Precio Total",
+        compute="_compute_precio_total",
+        store=True
+    )
+    @api.depends('platos', 'platos.precio_final')
+    def _compute_precio_total(self):
+        for menu in self:
+            precios = menu.platos.mapped('precio_final')
+            menu.precio_total = sum(precios)
 
 class ingredientes_david(models.Model):
     _name = 'gestion_restaurante_david.ingredientes_david'
@@ -107,7 +152,7 @@ class ingredientes_david(models.Model):
     )
 
     descripcion = fields.Text(
-        Stirng="Descripción"
+        string="Descripción"
     )
 
     plato_ids = fields.Many2many(

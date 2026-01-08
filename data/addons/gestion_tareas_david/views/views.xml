@@ -7,8 +7,11 @@
       <field name="arch" type="xml">
         <list>
           <field name="name"/>
+          <field name="codigo"/>
           <field name="descripcion"/>
           <field name="finalizado"/>
+          <field name="sprint"/>
+          <field name="rel_tecnologias" widget="many2many_tags"/>
         </list>
       </field>
     </record>
@@ -23,6 +26,7 @@
               <group string="Información">
                 <field name="name"/>
                 <field name="descripcion"/>
+                <field name="codigo"/>
               </group>
               <group string="Fechas">
                 <field name="fecha_creacion"/>
@@ -71,12 +75,13 @@
         <form>
           <sheet>
             <group>
-              <group>
+              <group string="Información">
                 <field name="name"/>
                 <field name="descripcion"/>
               </group>
-              <group>
+              <group string="Fechas">
                 <field name="fecha_ini"/>
+                <field name="duracion"/>
                 <field name="fecha_fin"/>
               </group>
             </group>

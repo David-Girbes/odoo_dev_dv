@@ -1,6 +1,11 @@
 from odoo import models, fields,api
+from odoo.exceptions import ValidationError,UserError
+import logging
 
+_logger = logging.getLogger(__name__)
 
+#PLATO-----------------------------------------------------------------
+#----------------------------------------------------------------------
 class plato_david(models.Model):
     _name = 'gestion_restaurante_david.plato_david'
     _description = 'Platos del restaurante'
@@ -66,13 +71,25 @@ class plato_david(models.Model):
         column2="ingrediente_id",
         string="Ingredientes"
     )
-    def _get_codigo(self):
-        for plato in self:
-            if not plato.categoria:
-                plato.codigo = "PLT_" + str(plato.id)
-            else:
-                plato.codigo = str(plato.categoria[:3]).upper() + "_" + str(plato.id)
 
+#MÉTODOS-----------------------------------------------------------------
+    def _get_codigo(self):
+        try:
+            for plato in self:
+                if not plato.categoria:
+                    _logger.warning(f"Plato {plato.name} sin categoría")
+                    plato.codigo = "PLT_" + str(plato.id)
+                    
+                else:
+                    plato.codigo = str(plato.categoria[:3]).upper() + "_" + str(plato.id)
+
+                _logger.debug(f"Se le asigna el codigo {plato.codigo}")
+
+        except Exception as e:
+            _logger.error(f"Error generando el código para plato {plato.id}: {str(e)}")
+            raise ValidationError(f"Error al generar el codigo: {str(e)}")
+
+#DEPENDS-----------------------------------------------------------------
     @api.depends('precio')
     def _compute_precio_iva(self):
         for plato in self:
@@ -80,7 +97,7 @@ class plato_david(models.Model):
                 plato.precio_con_iva = plato.precio * 1.10
             else:
                 plato.precio_con_iva = 0.0
-    
+
     @api.depends('precio', 'descuento')
     def _compute_precio_final(self):
         for plato in self:
@@ -92,8 +109,23 @@ class plato_david(models.Model):
             else:
                 plato.precio_final = 0.0
 
+#CONSTRAINS-----------------------------------------------------------------
+    @api.constrains('precio')
+    def _check_precio_positivo(self):
+        for plato in self:
+            if plato.precio <= 0:
+                raise ValidationError("El precio del plato no puede ser menor o igual a 0")
+
+    @api.constrains('tiempo_preparacion')
+    def _check_preparacion(self):
+        for plato in self:
+            if plato.tiempo_preparacion:
+                if plato.tiempo_preparacion < 1 or plato.tiempo_preparacion > 240:
+                    raise ValidationError("El tiempo de preparación debe estar entre 1 y 240")
 
 
+#MENU-----------------------------------------------------------------
+#---------------------------------------------------------------------
 class menu_david(models.Model):
     _name = 'gestion_restaurante_david.menu_david'
     _description = 'Menús del restaurante'
@@ -132,11 +164,30 @@ class menu_david(models.Model):
         compute="_compute_precio_total",
         store=True
     )
+
+#DEPENDS-----------------------------------------------------------------
     @api.depends('platos', 'platos.precio_final')
     def _compute_precio_total(self):
         for menu in self:
             precios = menu.platos.mapped('precio_final')
             menu.precio_total = sum(precios)
+
+#CONSTRAINS-----------------------------------------------------------------
+    @api.constrains('fecha_fin','fecha_inicio')
+    def _check_fecha(self):
+        for menu in self:
+            if menu.fecha_fin:
+                if menu.fecha_fin < menu.fecha_inicio:
+                    raise ValidationError("La Fecha fin debe ser posterior a la fecha de inicio")
+                
+    @api.constrains('platos','activo')
+    def _check_plato(self):
+        for menu in self:
+            if menu.activo and len(menu.platos) <= 0:
+                raise ValidationError("No puede haber un menú sin platos")
+
+#INGREDIENTES-----------------------------------------------------------------
+#-----------------------------------------------------------------------------
 
 class ingredientes_david(models.Model):
     _name = 'gestion_restaurante_david.ingredientes_david'

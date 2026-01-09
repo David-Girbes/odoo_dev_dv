@@ -1,5 +1,9 @@
 from datetime import timedelta
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class gestion_tareas_david(models.Model):
@@ -34,14 +38,22 @@ class gestion_tareas_david(models.Model):
         string='Tecnologías')
     
     def _get_codigo(self):
-        for tarea in self:
-            # Si la tarea no tiene un sprint asignado
-            if not tarea.sprint:
-                tarea.codigo = "TSK_" + str(tarea.id)
-            else:
-                # Si tiene sprint, usamos su nombre
-                tarea.codigo = str(tarea.sprint.name).upper() + "_" + str(tarea.id)
+        _logger.info("Iniciando generación de códigos de tareas")
 
+        for tarea in self:
+            try:
+                # Verificamos que tenga sprint asignado
+                if not tarea.sprint:
+                    _logger.warning(f"Tarea {tarea.id} sin sprint asignado")
+
+                # Generamos el código
+                tarea.codigo = str(tarea.sprint.name).upper() + "_" + str(tarea.id)
+                _logger.debug(f"Código generado: {tarea.codigo}")
+
+
+            except Exception as e:
+                _logger.error(f"Error generando código para tarea {tarea.id}: {str(e)}")
+                raise ValidationError(f"Error al generar el código: {str(e)}")
 
 class sprints_david(models.Model):
     _name = 'gestion_tareas_david.sprints_david'

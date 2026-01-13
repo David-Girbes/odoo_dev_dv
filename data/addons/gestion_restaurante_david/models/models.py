@@ -73,6 +73,7 @@ class plato_david(models.Model):
     )
 
 #MÉTODOS-----------------------------------------------------------------
+    @api.depends('categoria')
     def _get_codigo(self):
         try:
             for plato in self:

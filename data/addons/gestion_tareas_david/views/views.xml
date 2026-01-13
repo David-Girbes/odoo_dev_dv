@@ -1,6 +1,7 @@
 <odoo>
   <data>
     <!-- ==================== TAREAS ==================== -->
+    <!--VISTA-->
     <record model="ir.ui.view" id="gestion_tareas_david_list">
       <field name="name">gestion_tareas_david.list</field>
       <field name="model">gestion_tareas_david.gestion_tareas_david</field>
@@ -16,6 +17,7 @@
       </field>
     </record>
 
+    <!-- FORMULARIO-->
     <record model="ir.ui.view" id="gestion_tareas_david_form">
       <field name="name">gestion_tareas_david.form</field>
       <field name="model">gestion_tareas_david.gestion_tareas_david</field>
@@ -27,6 +29,7 @@
                 <field name="name"/>
                 <field name="descripcion"/>
                 <field name="codigo"/>
+                <field name="historia"/>
               </group>
               <group string="Fechas">
                 <field name="fecha_creacion"/>
@@ -64,6 +67,7 @@
           <field name="descripcion"/>
           <field name="fecha_ini"/>
           <field name="fecha_fin"/>
+          <field name="proyecto"/>
         </list>
       </field>
     </record>
@@ -78,6 +82,7 @@
               <group string="Información">
                 <field name="name"/>
                 <field name="descripcion"/>
+                <field name="proyecto"/>
               </group>
               <group string="Fechas">
                 <field name="fecha_ini"/>
@@ -145,10 +150,87 @@
       <field name="view_mode">list,form</field>
     </record>
 
+    <!--====================================HISTORIAS===================================== -->
+    <record model="ir.ui.view" id="gestion_tareas_david_historias_list">
+      <field name="name">gestion_tareas_david.historias.list</field>
+      <field name="model">gestion_tareas_david.historias_david</field>
+      <field name="arch" type="xml">
+        <list>
+          <field name="name"/>
+          <field name="descripcion"/>
+          <field name="proyecto"/>
+          <field name="tareas"/>
+        </list>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="gestion_tareas_david_historias_form">
+      <field name="name">gestion_tareas_david.historias.form</field>
+      <field name="model">gestion_tareas_david.historias_david</field>
+      <field name="arch" type="xml">
+        <form>
+          <sheet>
+            <group>
+              <field name="name"/>
+              <field name="descripcion"/>
+              <field name="proyecto"/>
+              <field name="tareas"/>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="gestion_tareas_david_historias_action_window">
+      <field name="name">Historias</field>
+      <field name="res_model">gestion_tareas_david.historias_david</field>
+      <field name="view_mode">list,form</field>
+    </record>
+
+    <!--====================================PROYECTOS===================================== -->
+    <record model="ir.ui.view" id="gestion_tareas_david_proyectos_list">
+      <field name="name">gestion_tareas_david.proyectos.list</field>
+      <field name="model">gestion_tareas_david.proyectos_david</field>
+      <field name="arch" type="xml">
+        <list>
+          <field name="name"/>
+          <field name="descripcion"/>
+          <field name="historias"/>
+          <field name="sprints"/>
+        </list>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="gestion_tareas_david_proyectos_form">
+      <field name="name">gestion_tareas_david.proyectos.form</field>
+      <field name="model">gestion_tareas_david.proyectos_david</field>
+      <field name="arch" type="xml">
+        <form>
+          <sheet>
+            <group>
+              <field name="name"/>
+              <field name="descripcion"/>
+              <field name="historias"/>
+              <field name="sprints"/>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="gestion_tareas_david_proyectos_action_window">
+      <field name="name">Proyectos</field>
+      <field name="res_model">gestion_tareas_david.proyectos_david</field>
+      <field name="view_mode">list,form</field>
+    </record>
+
     <!-- ==================== MENÚS ==================== -->
     <menuitem name="Gestión Tareas" id="gestion_tareas_david_menu_root"/>
-    <menuitem name="Tareas" id="gestion_tareas_david_menu_1" parent="gestion_tareas_david_menu_root" action="gestion_tareas_david_action_window"/>
-    <menuitem name="Sprints" id="gestion_tareas_david_menu_sprints" parent="gestion_tareas_david_menu_root" action="gestion_tareas_david_sprint_action_window"/>
-    <menuitem name="Tecnologías" id="gestion_tareas_david_menu_tecnologias" parent="gestion_tareas_david_menu_root" action="gestion_tareas_david_tecnologia_action_window"/>
+    <menuitem name="Tareas" id="gestion_tareas_david_menu_1" parent="gestion_tareas_david_menu_root" action="gestion_tareas_david_action_window" sequence="30"/>
+    <menuitem name="Sprints" id="gestion_tareas_david_menu_sprints" parent="gestion_tareas_david_menu_root" action="gestion_tareas_david_sprint_action_window" sequence="40"/>
+    <menuitem name="Tecnologías" id="gestion_tareas_david_menu_tecnologias" parent="gestion_tareas_david_menu_root" action="gestion_tareas_david_tecnologia_action_window" sequence="50"/>
+    <menuitem name="Historias" id="gestion_tareas_david_menu_historias" parent="gestion_tareas_david_menu_root" action="gestion_tareas_david_historias_action_window" sequence="20"/>
+    <menuitem name="Proyectos" id="gestion_tareas_david_menu_proyectos" parent="gestion_tareas_david_menu_root" action="gestion_tareas_david_proyectos_action_window" sequence="10"/>
+
   </data>
 </odoo>

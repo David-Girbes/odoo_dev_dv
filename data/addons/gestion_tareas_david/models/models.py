@@ -1,11 +1,11 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
 import logging
 
 _logger = logging.getLogger(__name__)
 
-
+#TAREAS------------------------------------------------------
 class gestion_tareas_david(models.Model):
     _name = 'gestion_tareas_david.gestion_tareas_david'
     _description = 'Gestión de Tareas'
@@ -27,7 +27,8 @@ class gestion_tareas_david(models.Model):
     sprint = fields.Many2one(
         'gestion_tareas_david.sprints_david', 
         string='Sprint relacionado', 
-        ondelete='set null', 
+        compute="_compute_sprint",
+        store=True, 
         help='Sprint al que pertenece esta tarea')
     
     rel_tecnologias = fields.Many2many(
@@ -37,24 +38,107 @@ class gestion_tareas_david(models.Model):
         column2='rel_tecnologias',
         string='Tecnologías')
     
+    historia = fields.Many2one(
+        'gestion_tareas_david.historias_david',
+        string="Historia de la tarea",
+        ondelete='set null',
+    )
+    
+    @api.depends('sprint','sprint.name')
     def _get_codigo(self):
         _logger.info("Iniciando generación de códigos de tareas")
 
         for tarea in self:
             try:
-                # Verificamos que tenga sprint asignado
                 if not tarea.sprint:
                     _logger.warning(f"Tarea {tarea.id} sin sprint asignado")
+                    tarea.codigo = "TSK_" + str(tarea.id)
 
-                # Generamos el código
-                tarea.codigo = str(tarea.sprint.name).upper() + "_" + str(tarea.id)
+                else:
+                    # Si tiene sprint, usamos su nombre
+                    tarea.codigo = str(tarea.sprint.name).upper() + "_" + str(tarea.id)
+
                 _logger.debug(f"Código generado: {tarea.codigo}")
-
 
             except Exception as e:
                 _logger.error(f"Error generando código para tarea {tarea.id}: {str(e)}")
                 raise ValidationError(f"Error al generar el código: {str(e)}")
 
+    @api.depends('historia', 'historia.proyecto')
+    def _compute_sprint(self):
+        for tarea in self:
+            tarea.sprint = False
+
+            # Verificar que la tarea tiene historia y proyecto
+            if tarea.historia and tarea.historia.proyecto:
+                # Buscar sprints del proyecto
+                sprints = self.env['gestion_tareas_david.sprints_david'].search([
+                    ('proyecto.id', '=', tarea.historia.proyecto.id)
+                ])
+
+                # Buscar el sprint activo (fecha_fin > ahora) 
+                # de entre todos los sprints asociados al proyecto
+                # en teoría solo hay un sprint activo, por eso es el que no ha vencido
+                for sprint in sprints:
+                    if (isinstance(sprint.fecha_fin, datetime) and 
+                            sprint.fecha_ini <= datetime.now() and   
+                            sprint.fecha_fin > datetime.now()):
+                        tarea.sprint = sprint.id
+                        break
+
+#PROYECTOS-----------------------------------------------------
+class proyectos_david(models.Model):
+    _name = 'gestion_tareas_david.proyectos_david'
+    _description = 'Gestión Proyectos'
+
+    name = fields.Char(
+        string="Nombre",
+        required=True
+    )
+
+    descripcion = fields.Text(
+        string="Descripción"
+    )
+
+    historias = fields.One2many(
+        comodel_name='gestion_tareas_david.historias_david',
+        inverse_name='proyecto',
+        string='Historias del proyecto')
+    
+    sprints = fields.One2many(
+        'gestion_tareas_david.sprints_david',
+        'proyecto',
+        string="Sprints"
+    )
+    
+    
+
+#HISTORIAS------------------------------------------------------
+class historias_david(models.Model):
+    _name = 'gestion_tareas_david.historias_david'
+    _description = "Historias"
+
+    name = fields.Char(
+        string="Nombre",
+        required=True
+    )
+
+    descripcion = fields.Text(
+        string="Descripción"
+    )
+
+    proyecto = fields.Many2one(
+        'gestion_tareas_david.proyectos_david', 
+        string='Proyecto', 
+        ondelete='set null', 
+        help='Proyecto a que pertenece')
+    
+    tareas = fields.One2many(
+        comodel_name='gestion_tareas_david.gestion_tareas_david',
+        inverse_name='historia',
+        string='Tareas de la historia')
+
+#SPRINTS----------------------------------------------------------
 class sprints_david(models.Model):
     _name = 'gestion_tareas_david.sprints_david'
     _description = 'Modelo de Sprints para Gestión de Proyectos'
@@ -75,6 +159,12 @@ class sprints_david(models.Model):
         comodel_name='gestion_tareas_david.gestion_tareas_david',
         inverse_name='sprint',
         string='Tareas')
+    
+    proyecto = fields.Many2one(
+        'gestion_tareas_david.proyectos_david',
+        string="Proyecto",
+        ondelete="set null"
+    )
 
     @api.depends('fecha_ini', 'duracion')
     def _compute_fecha_fin(self):
@@ -86,7 +176,7 @@ class sprints_david(models.Model):
     
     
 
-
+#TECNOLOGIAS---------------------------------------------------------------
 class tecnologias_david(models.Model):
     _name = 'gestion_tareas_david.tecnologias_david'
     _description = 'Tecnologías'

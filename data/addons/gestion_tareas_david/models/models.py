@@ -43,6 +43,12 @@ class gestion_tareas_david(models.Model):
         string="Historia de la tarea",
         ondelete='set null',
     )
+
+    proyecto = fields.Many2one(
+        'gestion_tareas_david.proyectos_david',
+        string='Proyecto',
+        related='historia.proyecto',
+        readonly=True)
     
     @api.depends('sprint','sprint.name')
     def _get_codigo(self):
@@ -137,6 +143,24 @@ class historias_david(models.Model):
         comodel_name='gestion_tareas_david.gestion_tareas_david',
         inverse_name='historia',
         string='Tareas de la historia')
+    
+    tecnologias = fields.Many2many(
+        "gestion_tareas_david.tecnologias_david", 
+        compute="_compute_tecnologias", 
+        string="Tecnologías Utilizadas")
+
+    @api.depends('tareas', 'tareas.rel_tecnologias')
+    def _compute_tecnologias(self):
+        for historia in self:
+            tecnologias_acumuladas = self.env['gestion_tareas_david.tecnologias_david']
+
+            # Recorrer todas las tareas de la historia
+            for tarea in historia.tareas:
+                # Sumar (concatenar) tecnologías de cada tarea
+                tecnologias_acumuladas = tecnologias_acumuladas + tarea.rel_tecnologias
+
+            # Asignar el resultado
+            historia.tecnologias = tecnologias_acumuladas
 
 #SPRINTS----------------------------------------------------------
 class sprints_david(models.Model):

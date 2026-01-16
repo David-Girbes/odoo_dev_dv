@@ -34,17 +34,7 @@ class plato_david(models.Model):
         help="disponibilidad del plato",
         default=True
     )
-    categoria = fields.Selection(
-        [
-            ('entrante', 'Entrante'),
-            ('principal', 'Principal'),
-            ('postre', 'Postre'),
-            ('bebida', 'Bebida')
-        ],
-        string="Categoría",
-        help="categoría del plato",
-        required=True
-    )
+    
 
     codigo = fields.Char(compute="_get_codigo")
 
@@ -72,17 +62,43 @@ class plato_david(models.Model):
         string="Ingredientes"
     )
 
+    
+    categoria_id = fields.Many2one(
+        'gestion_restaurante_david.categorias_david',
+        string="Categoria",
+        ondelete="set null"
+    )
+    chef_especializado = fields.Many2one(
+        'gestion_restaurante_david.chef_david',
+        compute="_compute_chef_especializado",
+        store=True,
+    )
+
 #MÉTODOS-----------------------------------------------------------------
-    @api.depends('categoria')
+
+    @api.depends('categoria_id')
+    def _compute_chef_especializado(self):
+        for plato in self:
+            if plato.categoria_id:
+                chef = self.env['gestion_restaurante_david.chef_david'].search([('especialidad_id', '=', plato.categoria_id.id)],limit=1)
+                if chef:
+                    plato.chef_especializado = chef
+                else:
+                    plato.chef_especializado = False
+            else:
+                plato.chef_especializado = False
+
+
+    @api.depends('categoria_id')
     def _get_codigo(self):
         try:
             for plato in self:
-                if not plato.categoria:
+                if not plato.categoria_id:
                     _logger.warning(f"Plato {plato.name} sin categoría")
                     plato.codigo = "PLT_" + str(plato.id)
                     
                 else:
-                    plato.codigo = str(plato.categoria[:3]).upper() + "_" + str(plato.id)
+                    plato.codigo = str(plato.categoria_id.name).upper() + "_" + str(plato.id)
 
                 _logger.debug(f"Se le asigna el codigo {plato.codigo}")
 
@@ -186,6 +202,68 @@ class menu_david(models.Model):
         for menu in self:
             if menu.activo and len(menu.platos) <= 0:
                 raise ValidationError("No puede haber un menú sin platos")
+            
+
+#CHEF------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
+class chef_david(models.Model):
+    _name= 'gestion_restaurante_david.chef_david'
+    _description = 'sigma'
+
+    name = fields.Char(
+        string="Nombre",
+        required=True
+    )
+
+    especialidad_id = fields.Many2one(
+        'gestion_restaurante_david.categorias_david',
+        string="Especialidad",
+        ondelete="set null"
+    )
+
+    platos_asignados = fields.One2many(
+        'gestion_restaurante_david.plato_david',
+        'chef_especializado',
+        string="Platos Asignados"
+    )
+
+            
+#CATEGORIAS-----------------------------------------------------------------
+#-----------------------------------------------------------------------------
+class categorias_david(models.Model):
+    _name= 'gestion_restaurante_david.categorias_david'
+    _description = 'sigma'
+
+    name = fields.Char(
+        string="Nombre",
+        required=True
+    )
+
+    descripcion = fields.Text(
+        string="Descripción"
+    )
+
+    platos_ids = fields.One2many(
+        'gestion_restaurante_david.plato_david',
+        'categoria_id',
+        string="Platos"
+    )
+
+    chef_ids = fields.One2many(
+        'gestion_restaurante_david.chef_david',
+        'especialidad_id',
+        string="Chefs"
+
+    )
+
+    ingredientes_comunes = fields.Many2many(
+        'gestion_restaurante_david.ingredientes_david',
+        relation="rel_categorias_ingredientes",
+        compute="_compute_ingredientes_comunes",
+        string="Ingredientes comunes"
+
+    )
+
 
 #INGREDIENTES-----------------------------------------------------------------
 #-----------------------------------------------------------------------------

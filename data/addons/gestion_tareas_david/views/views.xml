@@ -30,6 +30,7 @@
                 <field name="descripcion"/>
                 <field name="codigo"/>
                 <field name="historia"/>
+                <field name="proyecto"/>
               </group>
               <group string="Fechas">
                 <field name="fecha_creacion"/>
@@ -175,6 +176,7 @@
               <field name="descripcion"/>
               <field name="proyecto"/>
               <field name="tareas"/>
+              <field name="tecnologias"/>
             </group>
           </sheet>
         </form>

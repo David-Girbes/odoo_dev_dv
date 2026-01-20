@@ -41,6 +41,7 @@
                 <field name="descuento"/>
                 <field name="precio_final"/>
                 <field name="categoria_id"/>
+                <field name="fecha_alta"/>
               </group>
             </group>
             <group>
@@ -100,6 +101,9 @@
                 <field name="fecha_fin"/>
                 <field name="activo"/>
                 <field name="precio_total"/>
+                <field name="creado_por"/>
+                <field name="dias_disponible"/>
+
               </group>
             </group>
             <field name="platos">

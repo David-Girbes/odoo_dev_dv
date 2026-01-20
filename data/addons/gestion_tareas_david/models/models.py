@@ -16,7 +16,8 @@ class gestion_tareas_david(models.Model):
 
     descripcion = fields.Text(string='Descripción')
 
-    fecha_creacion = fields.Date(string='Fecha de Creación', default=fields.Date.today, readonly=True)
+
+    fecha_creacion = fields.Date(string='Fecha de Creación', default=lambda self: datetime.now(), readonly=True)
     
     fecha_ini = fields.Date(string='Fecha de Inicio')
 
@@ -44,11 +45,30 @@ class gestion_tareas_david(models.Model):
         ondelete='set null',
     )
 
+    def _get_proyecto_activo(self):
+        return self.env['gestion_tareas_david.proyectos_david'].search(
+        [('activo', '=', True)], 
+        limit=1, order='create_date desc')
+    
+
     proyecto = fields.Many2one(
         'gestion_tareas_david.proyectos_david',
         string='Proyecto',
         related='historia.proyecto',
-        readonly=True)
+        readonly=True,
+        default=_get_proyecto_activo)
+    
+    proyecto_default = fields.Many2one(
+        'gestion_tareas_david.proyectos_david',
+        string='Proyecto default',
+        default=_get_proyecto_activo)
+    
+    responsable = fields.Many2one(
+        'res.users',
+        string='Responsable',
+        default=lambda self: self.env.user.id)
+    
+
     
     @api.depends('sprint','sprint.name')
     def _get_codigo(self):
@@ -116,6 +136,11 @@ class proyectos_david(models.Model):
         'proyecto',
         string="Sprints"
     )
+
+    activo = fields.Boolean(
+    string= "Estado del proyecto",
+    default = True
+) 
     
     
 
@@ -172,6 +197,7 @@ class sprints_david(models.Model):
     fecha_ini = fields.Datetime(string="Fecha Inicio", required=True)
     duracion = fields.Integer(
         string="Duración", 
+        default=14,
         help="Cantidad de días que tiene asignado el sprint")
 
     fecha_fin = fields.Datetime(

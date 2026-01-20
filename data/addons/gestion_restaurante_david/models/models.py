@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from odoo import models, fields,api
 from odoo.exceptions import ValidationError,UserError
 import logging
@@ -22,7 +23,8 @@ class plato_david(models.Model):
     precio = fields.Float(
         string="Precio",
         help="precio del plato",
-        required=True
+        required=True,
+        default=5.0
     )
     tiempo_preparacion = fields.Integer(
         string="Tiempo preparación",
@@ -34,13 +36,18 @@ class plato_david(models.Model):
         help="disponibilidad del plato",
         default=True
     )
+
+    fecha_alta = fields.Date(
+        string="Fecha Alta",
+        default= lambda self: fields.Date.today()
+    )
     
 
     codigo = fields.Char(compute="_get_codigo")
 
     precio_con_iva = fields.Float(compute="_compute_precio_iva")
 
-    descuento = fields.Float(string="Descuento (%)",default=0)
+    descuento = fields.Float(string="Descuento (%)",default=0.0)
 
     precio_final = fields.Float(
         compute="_compute_precio_final",
@@ -63,10 +70,15 @@ class plato_david(models.Model):
     )
 
     
+    def _get_categoria_defecto(self):
+            return self.env['gestion_restaurante_david.categorias_david'].search([('name','=','Sin Clasificar')],limit=1)
+
+
     categoria_id = fields.Many2one(
         'gestion_restaurante_david.categorias_david',
         string="Categoria",
-        ondelete="set null"
+        ondelete="set null",
+        default=_get_categoria_defecto
     )
     chef_especializado = fields.Many2one(
         'gestion_restaurante_david.chef_david',
@@ -159,14 +171,30 @@ class menu_david(models.Model):
     fecha_inicio = fields.Date(
         string="Fecha de inicio",
         required=True
+        
     )
 
     fecha_fin = fields.Date(
-        string="Fecha Fin"
+        string="Fecha Fin",
+        compute="_compute_fecha_fin"
+    )
+
+    dias_disponible = fields.Integer(
+        string="Dias disponible",
+        default=7
     )
 
     activo = fields.Boolean(
-        string="Activo"
+        string="Activo",
+        default=False
+    )
+
+    creado_por = fields.Many2one(
+        'res.users',
+        string="Creado por",
+        default= lambda self: self.env.user.id,
+        readonly=True
+
     )
 
     platos = fields.One2many(
@@ -182,7 +210,18 @@ class menu_david(models.Model):
         store=True
     )
 
+    
+            
+
 #DEPENDS-----------------------------------------------------------------
+    @api.depends('fecha_inicio', 'dias_disponible')
+    def _compute_fecha_fin(self):
+        for menu in self:
+            if menu.fecha_inicio:
+                menu.fecha_fin = menu.fecha_inicio + timedelta(days=menu.dias_disponible)
+            else:
+                menu.fecha_fin = False
+
     @api.depends('platos', 'platos.precio_final')
     def _compute_precio_total(self):
         for menu in self:

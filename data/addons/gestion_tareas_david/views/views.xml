@@ -30,7 +30,9 @@
                 <field name="descripcion"/>
                 <field name="codigo"/>
                 <field name="historia"/>
-                <field name="proyecto"/>
+                <field name="proyecto_default"/>
+                <field name="responsable"/>
+
               </group>
               <group string="Fechas">
                 <field name="fecha_creacion"/>

@@ -68,6 +68,11 @@ class gestion_tareas_david(models.Model):
         string='Responsable',
         default=lambda self: self.env.user.id)
     
+    desarrollador_ids = fields.Many2one(
+        "res.partner",
+        string="Desarrollador"
+    )
+    
 
     
     @api.depends('sprint','sprint.name')
@@ -252,3 +257,47 @@ class tecnologias_david(models.Model):
         column1='rel_tecnologias',
         column2='rel_tareas',
         string='Tareas')
+    
+    desarrolladores_ids = fields.Many2many(
+        comodel_name="res.partner",
+        relation="rel_dev_tec",
+        column1="tecno_id",
+        column2="desarrollador_id",
+        string="Desarrolladores"
+    )
+    
+
+#DESARROLADOR-----------------------------------------------------------
+class desarrolladores_david(models.Model):
+    _name = 'res.partner'
+    _inherit = "res.partner"
+
+    tecnologias_ids = fields.Many2many(
+        comodel_name="gestion_tareas_david.tecnologias_david",
+        relation="rel_dev_tec",
+        column1="desarrollador_id",
+        column2="tecno_id",
+        string="Tecnologias"
+    )
+
+    es_desarrollador = fields.Boolean(
+        string="Es desarrollador",
+        default=False
+    )
+
+    @api.onchange('es_desarrollador')
+    def _onchange_es_desarrollador(self):
+        # Buscar la categoría "Desarrollador"
+        categorias = self.env['res.partner.category'].search([('name', '=', 'Desarrollador')])
+
+        if len(categorias) > 0:
+            # Si existe, usar la primera encontrada
+            category = categorias[0]
+        else:
+            # Si no existe, crearla
+            category = self.env['res.partner.category'].create({'name': 'Desarrollador'})
+
+        # Asignar la categoría al contacto
+        self.category_id = [(4, category.id)]
+
+

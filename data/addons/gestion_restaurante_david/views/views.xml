@@ -103,6 +103,7 @@
                 <field name="precio_total"/>
                 <field name="creado_por"/>
                 <field name="dias_disponible"/>
+                <field name="camareros_ids"/>
 
               </group>
             </group>
@@ -261,6 +262,62 @@
     </record>
 
 
+    <!-- VISTA DE CAMAREROS -->
+
+
+    <record model="ir.ui.view" id="gestion_restaurante_david.view_partner_form_inherit">
+      <field name="name">CAMAREROS</field>
+      <field name="model">res.partner</field>
+      <field name="inherit_id" ref="base.view_partner_form"/>
+      <field name="mode">primary</field>
+      <field name="arch" type="xml">
+
+       <xpath expr="//field[@name='vat']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath> 
+
+       <xpath expr="//page[@name='contact_addresses']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+
+      <xpath expr="//field[@name='function']" position="after">
+        <field name="seccion"/>
+      </xpath>
+
+        <xpath expr="//sheet/notebook/page[@name='internal_notes']" position="after">
+            <page name="devs" string="Datos Camarero" invisible="not es_camarero">
+                <group>                   
+                    <field name="menus_especialidad" widget="many2many_tags"/>
+                    <field name="es_camarero" invisible="1" />
+                    <field name="turno"/>
+                </group>
+            </page>
+        </xpath>
+      </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_camareros">
+      <field name="name">Camareros</field>
+      <field name="res_model">res.partner</field>
+      <field name="view_mode">list,form</field>
+      <field name="domain">[('es_camarero', '=', True)]</field>
+      <field name="context">{'default_es_camarero': True}</field>
+    </record>
+
+    <record model="ir.actions.act_window.view" id="action_view_camareros_list">
+      <field name="sequence" eval="1"/>
+      <field name="view_mode">list</field>
+      <field name="view_id" ref="base.view_partner_tree"/>
+      <field name="act_window_id" ref="action_camareros"/>
+    </record>
+
+    <record model="ir.actions.act_window.view" id="action_view_camareros_form">
+      <field name="sequence" eval="2"/>
+      <field name="view_mode">form</field>
+      <field name="view_id" ref="gestion_restaurante_david.view_partner_form_inherit"/>
+      <field name="act_window_id" ref="action_camareros"/>
+    </record>
+
     <!--  MENÚ PRINCIPAL -->
     
     <!-- Menú raíz -->
@@ -280,6 +337,8 @@
               action="action_categorias" sequence="4"/>
     <menuitem name="Chefs" id="menuitem_chefs" parent="menu_gestion"
               action="action_chefs" sequence="5"/>
+    <menuitem name="Camareros" id="menuitem_camareros" parent="menu_gestion"
+              action="action_camareros" sequence="6"/>
 
   </data>
 </odoo>

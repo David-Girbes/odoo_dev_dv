@@ -3,7 +3,7 @@ from odoo import models, fields,api
 from odoo.exceptions import ValidationError,UserError
 import logging
 
-_logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__) 
 
 #PLATO-----------------------------------------------------------------
 #----------------------------------------------------------------------
@@ -210,6 +210,14 @@ class menu_david(models.Model):
         store=True
     )
 
+    camareros_ids = fields.Many2many(
+        'res.partner',
+        relation="rel_menu_camarero",
+        column1="menu_id",
+        column2="camarero_id",
+        string="Camareros"
+    )
+
     
             
 
@@ -331,3 +339,43 @@ class ingredientes_david(models.Model):
         column2='plato_id',
         string="Platos"
     )
+
+class camareros_david(models.Model):
+    _name='res.partner'
+    _inherit='res.partner'
+
+    es_camarero = fields.Boolean(
+        string="Es Camarero"
+    )
+
+    turno = fields.Selection(
+        [('mañana','Mañana'),('tarde','Tarde'),('noche','Noche')],
+        string="Turno"
+    )
+
+    seccion = fields.Char(
+        string="Sección"
+    )
+
+    menus_especialidad = fields.Many2many(
+        'gestion_restaurante_david.menu_david',
+        relation="rel_menu_camarero",
+        column1="camarero_id",
+        column2="menu_id",
+        string="Menús"
+    )
+
+    @api.onchange('es_camarero')
+    def _onchange_es_camarero(self):
+        # Buscar la categoría "Desarrollador"
+        categorias = self.env['res.partner.category'].search([('name', '=', 'Camarero')])
+
+        if len(categorias) > 0:
+            # Si existe, usar la primera encontrada
+            category = categorias[0]
+        else:
+            # Si no existe, crearla
+            category = self.env['res.partner.category'].create({'name': 'Camarero'})
+
+        # Asignar la categoría al contacto
+        self.category_id = [(4, category.id)]

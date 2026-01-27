@@ -32,6 +32,11 @@
                 <field name="historia"/>
                 <field name="proyecto_default"/>
                 <field name="responsable"/>
+                <field name="desarrollador_ids" domain="[('es_desarrollador', '=', True)]"
+                            context="{
+                                        'form_view_ref': 'gestion_tareas_david.view_partner_form_inherit',
+                                        'default_es_desarrollador': True
+                                    }"/>
 
               </group>
               <group string="Fechas">
@@ -228,6 +233,63 @@
       <field name="view_mode">list,form</field>
     </record>
 
+
+
+    <!-- ==================== DESARROLLADORES ==================== -->
+
+
+
+
+    <record model="ir.ui.view" id="gestion_tareas_david.view_partner_form_inherit">
+      <field name="name">DESARROLLADOREs</field>
+      <field name="model">res.partner</field>
+      <field name="inherit_id" ref="base.view_partner_form"/>
+      <field name="mode">primary</field>
+      <field name="arch" type="xml">
+
+      <xpath expr="//field[@name='website']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+
+       <xpath expr="//page[@name='sales_purchases']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+
+        <xpath expr="//sheet/notebook/page[@name='internal_notes']" position="after">
+            <page name="devs" string="Datos Desarrollador">
+                <group>                   
+                    <field name="tecnologias_ids" widget="many2many_tags"/>
+                    <field name="es_desarrollador" />
+                </group>
+            </page>
+        </xpath>
+      </field>
+    </record>
+
+
+   
+    <record model="ir.actions.act_window" id="gestion_tareas_david_desarrolladores_action_window">
+      <field name="name">Desarrolladores</field>
+      <field name="res_model">res.partner</field>
+      <field name="view_mode">list,form</field>
+      <field name="domain">[('es_desarrollador', '=', True)]</field>
+      <field name="context">{'default_es_desarrollador': True}</field>
+    </record>
+
+    <record model="ir.actions.act_window.view" id="action_view_desarrolladores_list">
+      <field name="sequence" eval="1"/>
+      <field name="view_mode">list</field>
+      <field name="view_id" ref="base.view_partner_tree"/>
+      <field name="act_window_id" ref="gestion_tareas_david_desarrolladores_action_window"/>
+    </record>
+
+    <record model="ir.actions.act_window.view" id="action_view_desarrolladores_form">
+      <field name="sequence" eval="2"/>
+      <field name="view_mode">form</field>
+      <field name="view_id" ref="gestion_tareas_david.view_partner_form_inherit"/>
+      <field name="act_window_id" ref="gestion_tareas_david_desarrolladores_action_window"/>
+    </record>
+
     <!-- ==================== MENÚS ==================== -->
     <menuitem name="Gestión Tareas" id="gestion_tareas_david_menu_root"/>
     <menuitem name="Tareas" id="gestion_tareas_david_menu_1" parent="gestion_tareas_david_menu_root" action="gestion_tareas_david_action_window" sequence="30"/>
@@ -235,6 +297,7 @@
     <menuitem name="Tecnologías" id="gestion_tareas_david_menu_tecnologias" parent="gestion_tareas_david_menu_root" action="gestion_tareas_david_tecnologia_action_window" sequence="50"/>
     <menuitem name="Historias" id="gestion_tareas_david_menu_historias" parent="gestion_tareas_david_menu_root" action="gestion_tareas_david_historias_action_window" sequence="20"/>
     <menuitem name="Proyectos" id="gestion_tareas_david_menu_proyectos" parent="gestion_tareas_david_menu_root" action="gestion_tareas_david_proyectos_action_window" sequence="10"/>
+    <menuitem name="Desarrolladores" id="gestion_tareas_david_menu_desarrolladores" parent="gestion_tareas_david_menu_root" action="gestion_tareas_david_desarrolladores_action_window" sequence="60"/>
 
   </data>
 </odoo>

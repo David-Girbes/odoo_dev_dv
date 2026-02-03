@@ -70,12 +70,16 @@
       <field name="name">gestion_tareas_david.sprint.list</field>
       <field name="model">gestion_tareas_david.sprints_david</field>
       <field name="arch" type="xml">
-        <list>
-          <field name="name"/>
-          <field name="descripcion"/>
-          <field name="fecha_ini"/>
-          <field name="fecha_fin"/>
-          <field name="proyecto"/>
+        <list decoration-info="activo == True"
+            decoration-muted="activo == False"
+            decoration-warning="duracion &lt; 7"
+            decoration-success="duracion == 14">
+            <field name="name"/>
+            <field name="descripcion"/>
+            <field name="duracion" sum="Total días" avg="Promedio"/>
+            <field name="fecha_ini"/>
+            <field name="fecha_fin"/>
+            <field name="activo" widget="boolean_toggle"/>
         </list>
       </field>
     </record>

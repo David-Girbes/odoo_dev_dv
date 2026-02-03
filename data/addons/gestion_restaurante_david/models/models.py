@@ -189,6 +189,18 @@ class menu_david(models.Model):
         default=False
     )
 
+    vencido = fields.Boolean(
+        string="Vencido",
+        compute="_compute_vencido",
+        help="Indica si el menú ya pasó su fecha de fin"
+    )
+
+    proximo_vencer = fields.Boolean(
+        string="Próximo a vencer",
+        compute="_compute_proximo_vencer",
+        help="Indica si el menú vence en menos de 3 días"
+    )
+
     creado_por = fields.Many2one(
         'res.users',
         string="Creado por",
@@ -235,6 +247,25 @@ class menu_david(models.Model):
         for menu in self:
             precios = menu.platos.mapped('precio_final')
             menu.precio_total = sum(precios)
+
+    @api.depends('fecha_fin')
+    def _compute_vencido(self):
+        hoy = fields.Date.today()
+        for menu in self:
+            if menu.fecha_fin:
+                menu.vencido = menu.fecha_fin < hoy
+            else:
+                menu.vencido = False
+
+    @api.depends('fecha_fin')
+    def _compute_proximo_vencer(self):
+        hoy = fields.Date.today()
+        for menu in self:
+            if menu.fecha_fin:
+                dias_restantes = (menu.fecha_fin - hoy).days
+                menu.proximo_vencer = 0 <= dias_restantes <= 3
+            else:
+                menu.proximo_vencer = False
 
 #CONSTRAINS-----------------------------------------------------------------
     @api.constrains('fecha_fin','fecha_inicio')

@@ -8,13 +8,13 @@
       <field name="name">Lista de Platos</field>
       <field name="model">gestion_restaurante_david.plato_david</field>
       <field name="arch" type="xml">
-        <list>
+        <list decoration-muted="disponible==False" decoration-success="descuento &gt; 0" decoration-warning="precio &gt; 20">
           <field name="name"/>
           <field name="codigo"/>
           <field name="categoria_id"/>
           <field name="precio"/>
           <field name="precio_con_iva"/>
-          <field name="precio_final"/>
+          <field name="precio_final" sum="Total Ingresos"/>
           <field name="disponible"/>
           <field name="menu_id"/>
           <field name="chef_especializado"/>
@@ -75,11 +75,14 @@
       <field name="name">Lista de Menús</field>
       <field name="model">gestion_restaurante_david.menu_david</field>
       <field name="arch" type="xml">
-        <list>
+        <list decoration-info="activo==True" decoration-muted="vencido==True" decoration-warning="proximo_vencer==True">
           <field name="name"/>
           <field name="fecha_inicio"/>
           <field name="fecha_fin"/>
           <field name="activo"/>
+          <field name="vencido" invisible="1"/>
+          <field name="proximo_vencer" invisible="1"/>
+          <field name="precio_total" sum="Total"/>
         </list>
       </field>
     </record>
@@ -135,8 +138,10 @@
       <field name="name">Lista de Ingredientes</field>
       <field name="model">gestion_restaurante_david.ingredientes_david</field>
       <field name="arch" type="xml">
-        <list>
+        <list decoration-danger="es_alergeno==True">
           <field name="name"/>
+          <field name="es_alergeno"/>
+          <field name="descripcion"/>
         </list>
       </field>
     </record>

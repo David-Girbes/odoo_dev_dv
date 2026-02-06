@@ -1,0 +1,43 @@
+<odoo>
+  <data>
+    <!-- VISTAS DRON-->
+
+    <record model="ir.ui.view" id="dron_list">
+      <field name="name">dronify list</field>
+      <field name="model">dronify.dron</field>
+      <field name="arch" type="xml">
+        <list>
+          <field name="name"/>
+        </list>
+      </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_drones">
+      <field name="name">Drones</field>
+      <field name="res_model">dronify.dron</field>
+      <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- VISTAS CONTACTO-->
+
+    <record model="ir.actions.act_window" id="action_contacto">
+      <field name="name">Contacto</field>
+      <field name="res_model">res.partner</field>
+      <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- MENÚS -->
+    <menuitem name="Dronify" id="dronify.menu_root"/>
+    
+    <menuitem name="Menú" id="menu_gestion" parent="menu_root"/>
+    
+
+    <!-- Items del menú -->
+    <menuitem name="Drones" id="menuitem_drones" parent="menu_gestion"
+              action="action_drones" sequence="1"/>
+    <menuitem name="Contactos" id="menuitem_contactos" parent="menu_gestion"
+              action="action_contacto" sequence="2"/>
+
+
+  </data>
+</odoo>

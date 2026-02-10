@@ -57,11 +57,13 @@ class contacto(models.Model):
     )
 
     es_piloto = fields.Boolean(
-        string="Es Piloto"
+        string="Es Piloto",
+        defualt=True,
+        readonly=True
     )
 
     licencia = fields.Char(
-        string="Licencia",
+        string="Licencia"
     )
 
     dron_autorizado_ids = fields.Many2many(

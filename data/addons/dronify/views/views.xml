@@ -10,30 +10,11 @@
           <field name="name"/>
           <field name="capacidad_max"/>
           <field name="bateria" widget="progressbar"/>
-          <field name="estado" widget="badge"/>
+          <field name="estado" widget="badge" decoration-warning="estado == 'vuelo'" decoration-success="estado == 'disponible'"/>
         </list>
       </field>
     </record>
 
-    <record model="ir.ui.view" id="dron_form">
-      <field name="name">Formulario de Drones</field>
-      <field name="model">dronify.dron</field>
-      <field name="arch" type="xml">
-        <form>
-          <sheet>
-            <group>
-              <group>
-                <field name="name"/>
-                <field name="capacidad_max"/>
-                <field name="bateria"/>
-                <field name="estado"/>
-                <field name="piloto_autorizado_ids" widget="many2many_tags"/>
-              </group>
-            </group>
-          </sheet>
-        </form>
-      </field>
-    </record>
 
 
     <!-- Actions dron-->
@@ -43,9 +24,9 @@
       <field name="view_mode">list,form</field>
     </record>
 
-    <!-- VISTAS CONTACTO_______________________________________ -->
+    <!-- FORMULARIO PILOTOS_______________________________________ -->
 
-    <record model="ir.ui.view" id="dronify.view_partner_form_inherit">
+    <record model="ir.ui.view" id="dronify.view_partner_form_inherit_pilot">
       <field name="name">PILOTOS</field>
       <field name="model">res.partner</field>
       <field name="inherit_id" ref="base.view_partner_form"/>
@@ -74,21 +55,65 @@
         <xpath expr="//field[@name='category_id']" position="after">
           <group string="Información de Vuelo y Cliente" name="seccion_pilotos">
             <group>
-              <field name="es_piloto"/>
-              <field name="es_cliente"/>
-              <field name="es_vip" invisible="not es_cliente"/>
+              <field name="es_piloto" readonly="1"/>
               <field name="licencia" required="es_piloto"/>
               <field name="dron_autorizado_ids" widget="many2many_tags"/>
+            </group>
+            <group>
+            <field name="es_cliente"/>
+              <field name="es_vip" invisible="not es_cliente"/>
+            </group>  
+          </group>
+        </xpath>
+      </field>
+    </record>
+
+    <!-- FORMULARIO CLIENTES-->
+    <record model="ir.ui.view" id="dronify.view_partner_form_inherit_cliente">
+      <field name="name">PILOTOS</field>
+      <field name="model">res.partner</field>
+      <field name="inherit_id" ref="base.view_partner_form"/>
+      <field name="mode">primary</field>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='function']" position="attributes">
+          <attribute name="invisible">1</attribute>
+        </xpath>
+
+        <xpath expr="//field[@name='website']" position="attributes">
+          <attribute name="invisible">1</attribute>
+        </xpath>
+
+        <xpath expr="//page[@name='contact_addresses']" position="attributes">
+          <attribute name="invisible">1</attribute>
+        </xpath>
+
+        <xpath expr="//page[@name='sales_purchases']" position="attributes">
+          <attribute name="invisible">1</attribute>
+        </xpath>
+
+        <xpath expr="//page[@name='internal_notes']" position="attributes">
+          <attribute name="invisible">1</attribute>
+        </xpath>
+
+        <xpath expr="//field[@name='category_id']" position="after">
+          <group string="Información de Vuelo y Cliente" name="seccion_pilotos">
+            <group>
+              <field name="es_cliente" readonly="1"/>
+              <field name="es_vip" />
+            </group>
+            <group>
+              <field name="es_piloto"/>
+              <field name="licencia" required="es_piloto" invisible="not es_piloto"/>
+              <field name="dron_autorizado_ids" widget="many2many_tags" invisible="not es_piloto"/>
             </group>
           </group>
         </xpath>
       </field>
     </record>
 
-    
+    <!-- Contacto action-->
 
-
-    <record model="ir.actions.act_window" id="action_contacto">
+    <record model="ir.actions.act_window" id="action_piloto">
       <field name="name">Contactos</field>
       <field name="res_model">res.partner</field>
       <field name="view_mode">list,form</field>
@@ -96,18 +121,42 @@
       <field name="context">{'default_es_piloto':True}</field>      
     </record>
 
+    <record model="ir.actions.act_window" id="action_cliente">
+      <field name="name">Contactos</field>
+      <field name="res_model">res.partner</field>
+      <field name="view_mode">list,form</field>
+      <field name="domain">[('es_cliente','=',True)]</field>
+      <field name="context">{'default_es_cliente':True}</field>      
+    </record>
+
+    <!-- PILOTOS-->
     <record model="ir.actions.act_window.view" id="action_contacto_pilotos_view">
       <field name="sequence" eval="1"></field>
       <field name="view_mode">list</field>
       <field name="view_id" ref="base.view_partner_tree"></field>
-      <field name="act_window_id" ref="action_contacto"></field>      
+      <field name="act_window_id" ref="action_piloto"></field>      
     </record>
 
     <record model="ir.actions.act_window.view" id="action_view_contacto_pilotos_form">
       <field name="sequence" eval="2"/>
       <field name="view_mode">form</field>
-      <field name="view_id" ref="dronify.view_partner_form_inherit"/>
-      <field name="act_window_id" ref="action_contacto"/>
+      <field name="view_id" ref="dronify.view_partner_form_inherit_pilot"/>
+      <field name="act_window_id" ref="action_piloto"/>
+    </record>
+
+    <!-- CLIENTES-->
+    <record model="ir.actions.act_window.view" id="action_contacto_clientes_view">
+      <field name="sequence" eval="1"></field>
+      <field name="view_mode">list</field>
+      <field name="view_id" ref="base.view_partner_tree"></field>
+      <field name="act_window_id" ref="action_cliente"></field>      
+    </record>
+
+    <record model="ir.actions.act_window.view" id="action_view_contacto_clientes_form">
+      <field name="sequence" eval="2"/>
+      <field name="view_mode">form</field>
+      <field name="view_id" ref="dronify.view_partner_form_inherit_cliente"/>
+      <field name="act_window_id" ref="action_cliente"/>
     </record>
 
 
@@ -131,7 +180,7 @@
     <record model="ir.actions.act_window" id="action_paquetes">
       <field name="name">Paquetes</field>
       <field name="res_model">dronify.paquete</field>
-      <field name="view_mode">list,form</field>
+      <field name="view_mode">list</field>
     </record>
 
     <!-- VISTAS VUELOS__________________________________________ -->
@@ -148,7 +197,7 @@
           <field name="peso_total"/>
           <field name="preparado" widget="boolean_toggle"/>
           <field name="realizado" widget="boolean_toggle"/>
-          <!-- <field name="consumo_estimado"/> -->
+          <field name="consumo_estimado"/>
         </list>
       </field>
     </record>
@@ -158,24 +207,47 @@
       <field name="model">dronify.vuelo</field>
       <field name="arch" type="xml">
         <form>
-          <header>
+          <header invisible="realizado == True">
+            <button 
+            name="preparar_vuelo"
+            type="object" string="Preparar Vuelo" 
+            class="oe_highlight"
+            invisible="preparado == True"/>
+            
+            <button 
+            name="desbloquear" 
+            type="object" string="Modificar Datos" 
+            class="oe_highlight"
+            invisible="preparado == False"/>
+            
+            <button 
+            name="realizar_vuelo" 
+            type="object" string="Marcar como Realizado" 
+            class="oe_highlight"
+            invisible="preparado == False"/>
           </header>
           <sheet>
-            <group string="Planificación">
-              <field name="name"/>
-              <field name="dron_id"/>
-              <field name="piloto_id"/>
+            <group>
+              <group string="Planificación" >
+                <field name="name" readonly="preparado == True"/>
+                <field name="dron_id" readonly="preparado == True"/>
+                <field name="piloto_id" readonly="preparado == True"/>
+              </group>
+              <group string="Estado y control">
+                <field name="preparado"/>
+                <field name="realizado"/>
+              </group>
             </group>
-            <group string="Estado y control">
-              <field name="preparado"/>
-              <field name="realizado"/>
-            </group>
+            <notebook>
+              <page string="Paquetes y Consumo">
+                <group>
+                  <field name="paquetes_ids"/>
+                  <field name="peso_total"/>
+                  <field name="consumo_estimado"/>
+                </group>
+              </page>
+            </notebook>
           </sheet>
-          <footer>
-            <field name="paquetes_ids"/>
-            <field name="peso_total"/>
-            <!-- <field name="consumo_estimado"> -->
-          </footer>
         </form>
       </field>
     </record>
@@ -197,12 +269,14 @@
     <!-- Items del menú -->
     <menuitem name="Drones" id="menuitem_drones" parent="menu_gestion"
               action="action_drones" sequence="1"/>
-    <menuitem name="Contactos" id="menuitem_contactos" parent="menu_gestion"
-              action="action_contacto" sequence="2"/>
+    <menuitem name="Pilotos" id="menuitem_pilotos" parent="menu_gestion"
+              action="action_piloto" sequence="2"/>
+    <menuitem name="Clientes" id="menuitem_clientes" parent="menu_gestion"
+              action="action_cliente" sequence="3"/>
     <menuitem name="Paquetes" id="menuitem_paquetes" parent="menu_gestion"
-              action="action_paquetes" sequence="3"/>
+              action="action_paquetes" sequence="4"/>
     <menuitem name="Vuelos" id="menuitem_vuelos" parent="menu_gestion"
-              action="action_vuelos" sequence="4"/>
+              action="action_vuelos" sequence="5"/>
 
 
   </data>

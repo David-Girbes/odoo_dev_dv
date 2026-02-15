@@ -187,7 +187,11 @@ class vuelo(models.Model):
     @api.depends('paquetes_ids.peso')
     def _compute_consumo(self):
         for vuelo in self:
-            vuelo.consumo_estimado = calcular_consumo_vuelo(vuelo.peso_total)
+            es_vip = False
+            for paquete in vuelo.paquetes_ids:
+                if paquete.cliente_id and paquete.cliente_id.es_vip:
+                    es_vip = True
+            vuelo.consumo_estimado = calcular_consumo_vuelo(vuelo.peso_total,es_vip=es_vip)
         
     @api.depends('create_date')
     def _compute_codigo(self):

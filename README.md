@@ -17,3 +17,6 @@ Avanzar las vistas de piloto
 ## Dia 4
 
 He hecho toda la lógica de todos los campos, y acabado del todo las vistas de res.partner, vista de vuelo
+
+## Dia 5
+He ajustado el calculo del consumo para que se considerara si hay un cliente vip
